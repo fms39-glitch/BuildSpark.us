@@ -1411,8 +1411,39 @@
             transition-delay: .3s;
         }
 
-        /* RESPONSIVE */
-        @media(max-width:960px) {
+        /* ═══ RESPONSIVE ═══ */
+        @media(max-width: 1024px) {
+            .hero-title {
+                font-size: clamp(3rem, 6vw, 5rem);
+            }
+
+            .process-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 24px 0;
+            }
+
+            .process-grid::before {
+                display: none;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .ai-agent-grid {
+                gap: 40px;
+            }
+
+            .contact-inner {
+                gap: 40px;
+            }
+        }
+
+        @media(max-width: 768px) {
             nav {
                 padding: 16px 24px;
             }
@@ -1424,38 +1455,107 @@
             #hero,
             .section-wrap,
             .projects-inner,
-            .contact-inner,
-            .ai-agent-inner {
+            .ai-agent-inner,
+            .contact-inner {
                 padding-left: 24px;
                 padding-right: 24px;
+                padding-top: 80px;
+                padding-bottom: 80px;
             }
 
             .hero-visual {
                 display: none;
             }
 
+            .hero-title {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+                line-height: 1;
+            }
+
+            .hero-desc {
+                font-size: .8rem;
+                margin-bottom: 32px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .btn-primary {
+                text-align: center;
+            }
+
+            .btn-ghost {
+                justify-content: center;
+            }
+
             .hero-stats {
                 flex-wrap: wrap;
                 gap: 24px;
+                justify-content: space-between;
+            }
+
+            .stat {
+                flex: 1 1 40%;
+            }
+
+            .stat-num {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: clamp(1.8rem, 8vw, 2.8rem);
+                margin-bottom: 40px;
             }
 
             .process-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
+                gap: 16px;
             }
 
-            .process-grid::before {
-                display: none;
+            .process-step {
+                display: flex;
+                align-items: flex-start;
+                gap: 16px;
+                padding: 12px;
+                border: 1px solid rgba(14, 165, 233, .05);
+                background: rgba(14, 165, 233, .02);
+                border-radius: 4px;
             }
 
-            .projects-grid,
-            .team-grid,
+            .step-num {
+                flex-shrink: 0;
+                width: 40px;
+                height: 40px;
+                margin-bottom: 0;
+                font-size: .85rem;
+            }
+
             .ai-agent-grid {
                 grid-template-columns: 1fr;
             }
 
+            .ai-visual {
+                display: none;
+            }
+
+            .ai-feature {
+                padding: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
             .contact-inner {
                 grid-template-columns: 1fr;
-                gap: 44px;
+                gap: 48px;
             }
 
             .form-row {
@@ -1464,9 +1564,42 @@
 
             footer {
                 flex-direction: column;
-                gap: 16px;
+                gap: 24px;
                 text-align: center;
-                padding: 24px;
+                padding: 32px 24px;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 16px;
+            }
+        }
+
+        @media(max-width: 480px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .stat {
+                flex: 1 1 100%;
+                text-align: left;
+            }
+
+            .marquee-item {
+                font-size: .55rem;
+            }
+
+            .section-wrap,
+            .projects-inner,
+            .ai-agent-inner,
+            .contact-inner {
+                padding-top: 60px;
+                padding-bottom: 60px;
+            }
+
+            .call-number {
+                font-size: 1.2rem;
             }
         }
     </style>
