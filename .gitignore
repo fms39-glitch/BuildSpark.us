@@ -1,0 +1,14 @@
+# Virtual environments
+env/
+venv/
+.env
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Database
+buildspark_leads.db
+
+# Logs
+leads.log
