@@ -18,7 +18,11 @@ import re
 import json
 import logging
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
+
+from dotenv import load_dotenv
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -26,17 +30,10 @@ logger = logging.getLogger(__name__)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    _model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
-        generation_config=genai.GenerationConfig(
-            max_output_tokens=200,
-            temperature=0.75,
-        ),
-    )
-    logger.info("Gemini 1.5 Flash ready ✓")
+    _client = genai.Client(api_key=GEMINI_API_KEY)
+    logger.info("Gemini 1.5 Flash ready.")
 else:
-    _model = None
+    _client = None
     logger.warning("GEMINI_API_KEY missing — using fallback responses only")
 
 
@@ -146,7 +143,7 @@ def get_ai_response(conversation_history: list, user_message: str) -> str:
     and the latest caller message. Returns Gemini's reply as a string.
     Appends both the user message and AI reply to conversation_history.
     """
-    if not _model:
+    if not _client:
         logger.error("Gemini model not initialised — GEMINI_API_KEY missing")
         return FALLBACK
 
@@ -179,7 +176,14 @@ def get_ai_response(conversation_history: list, user_message: str) -> str:
             *gemini_history,
         ]
 
-        response = _model.generate_content(full_chat)
+        response = _client.models.generate_content(
+            model='gemini-1.5-flash',
+            contents=full_chat,
+            config=types.GenerateContentConfig(
+                max_output_tokens=200,
+                temperature=0.75,
+            )
+        )
         reply    = response.text.strip()
         logger.info(f"Gemini reply ({len(reply)} chars): {reply[:80]}...")
 
