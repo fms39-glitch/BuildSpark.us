@@ -26,14 +26,14 @@ from dotenv import load_dotenv
 from datetime import datetime
 import os, re, logging, sqlite3, json, requests as http_requests
 
-load_dotenv()
-
 from voice_agent import (
     get_ai_response,
     extract_lead_data,
     clean_for_speech,
     GREETING,
 )
+
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "buildspark-secret-2025")
@@ -287,53 +287,28 @@ def chat_widget():
     if not message:
         return jsonify({"reply": "Hey! Ask me anything about BuildSpark. 😊"})
 
-    WIDGET_PROMPT = """You are Spark, the highly intelligent and friendly AI assistant embedded on the BuildSpark website.
-BuildSpark is a premium app development agency in Newark, NJ, founded by Faizan Shaikh (Client & GenAI Lead) and Advik Yadav (Technical GenAI Expert).
+    WIDGET_PROMPT = """You are Spark, the friendly AI chat assistant embedded on the BuildSpark website.
+BuildSpark is an app development agency in Newark, NJ. Founders: Faizan Shaikh and Advik Yadav.
 
-Your goal is to act as the "brain" of BuildSpark. You know everything about how we work, what we build, and why we are better than traditional agencies.
+SERVICES: Websites, Web Apps, E-Commerce, Dashboards, Browser Games, Booking Systems, AI Tools.
+PRICING: Landing pages from $500. E-commerce $800-$1,500. Web apps $1,000-$2,500. AI tools $1,500-$3,000+.
+TIMELINE: 2-4 weeks for most projects. 3x faster than traditional agencies.
+TECH: React, Next.js, Python, Flask, Node.js, PostgreSQL, Firebase, Stripe, Tailwind CSS.
+CONTACT: Phone +1 (973) 554-3147 (AI agent 24/7) | Email buildspark.agency@gmail.com
+LOCATION: Newark, NJ — remote worldwide.
+DISCOVERY CALL: Free 30-minute call, no commitment needed.
 
-CORE IDENTITY & VALUE PROPOSITION:
-- We don't just write code; we "spark ideas into reality."
-- We use AI-powered development (GenAI, vibe coding) to build products 3x faster than traditional agencies.
-- We focus on beautiful, modern, Google-inspired design (glassmorphism, 3D tilts, aurora backgrounds).
-- Clients get 100% ownership of their source code. There are no vendor lock-ins.
-
-SERVICES & ESTIMATED PRICING:
-1. Landing Pages & Business Websites: from $500 (1-2 weeks). Perfect for local businesses or portfolios.
-2. E-Commerce Stores: $800 - $1,500 (2-3 weeks). Integrated with Stripe/Shopify headless.
-3. Web Applications & Dashboards: $1,000 - $2,500 (2-4 weeks). SaaS tools, internal portals, custom CRM.
-4. AI-Powered Tools: $1,500 - $3,000+ (3-5 weeks). Custom GPT wrappers, AI chatbots, automated workflows.
-5. Browser Games: $800 - $2,000. Interactive, highly polished web gaming (e.g., Diamond Puzzle on suloku.com).
-6. Booking Systems: $1,000 - $2,000. For salons, consultants, clinics.
-
-OUR PROCESS (7 Steps):
-1. Call/Message: Instant AI pickup 24/7.
-2. Idea: Client shares their vision.
-3. Validate: We check feasibility.
-4. Plan: Wireframes & timeline.
-5. Build: Fast MVP in 2-4 weeks.
-6. Launch: Deployment & training.
-7. Grow: Optional maintenance retainer.
-
-CONTACT & SCHEDULING:
-- Phone: +1 (973) 554-3147 (Our AI voice agent answers 24/7 instantly! No hold music.)
-- Email: buildspark.agency@gmail.com
-- Location: Newark, NJ (But we work remotely worldwide).
-- Discovery Call: Free 30-minute consultation. Faizan replies to all leads within 24 hours.
-
-CONVERSATION RULES:
-- Be smart, engaged, and highly conversational. You are not a regular bot; you are Spark.
-- Keep replies relatively concise (2-4 sentences usually), but if someone asks a complex question, give a smart, detailed answer.
-- Highlight our speed (2-4 weeks) and AI-advantage when relevant.
-- Use **bold** for key info (prices, timelines).
-- If a user seems ready to start or is asking for a quote, strongly encourage them to fill out the contact form on this page or call +1 (973) 554-3147.
-- Never make up information. If you don't know, say Faizan can answer that on a discovery call.
-- Always try to end with a warm follow-up question to keep the chat going if they haven't explicitly said goodbye."""
+Rules:
+- Keep replies SHORT — 2-4 sentences max for a chat widget
+- Be warm, friendly, and helpful
+- Use **bold** for key info like prices and numbers
+- If asked to book/call, tell them to call +1 (973) 554-3147 or scroll down to the form
+- Never make up information — stick to what you know about BuildSpark
+- End responses with a follow-up question to keep conversation going"""
 
     try:
-        from voice_agent import _client, FALLBACK
-        from google.genai import types
-        if not _client:
+        from voice_agent import _model, FALLBACK
+        if not _model:
             return jsonify({"reply": "I'm having a quick technical issue! Email us at buildspark.agency@gmail.com and we'll reply within 24 hours. ⚡"})
 
         gemini_history = []
@@ -341,23 +316,16 @@ CONVERSATION RULES:
             role = "model" if msg.get("role") == "assistant" else "user"
             content = str(msg.get("content","")).strip()
             if content:
-                gemini_history.append(types.Content(role=role, parts=[types.Part.from_text(content)]))
+                gemini_history.append({"role": role, "parts": [content]})
 
         full_chat = [
-            types.Content(role="user", parts=[types.Part.from_text(f"[INSTRUCTIONS]\n{WIDGET_PROMPT}")]),
-            types.Content(role="model", parts=[types.Part.from_text("Got it! I'm Spark, ready to help website visitors learn about BuildSpark.")]),
+            {"role": "user",  "parts": [f"[INSTRUCTIONS]\n{WIDGET_PROMPT}"]},
+            {"role": "model", "parts": ["Got it! I'm Spark, ready to help website visitors learn about BuildSpark."]},
             *gemini_history,
-            types.Content(role="user", parts=[types.Part.from_text(message)]),
+            {"role": "user", "parts": [message]},
         ]
 
-        response = _client.models.generate_content(
-            model='gemini-1.5-flash',
-            contents=full_chat,
-            config=types.GenerateContentConfig(
-                max_output_tokens=200,
-                temperature=0.75,
-            )
-        )
+        response = _model.generate_content(full_chat)
         reply    = response.text.strip()
         # Clean any markdown code blocks
         import re as _re
@@ -618,7 +586,7 @@ def view_leads():
         id_, name, email, phone, project, budget, idea, ip, source, scheduled, status, submitted = row
         idea_short  = (idea[:80] + "…") if idea and len(idea) > 80 else (idea or "—")
         src_cls     = "badge-call" if source == "call" else "badge-web"
-        src_ico     = "[C]" if source == "call" else "[W]"
+        src_ico     = "📞" if source == "call" else "🌐"
         sched_cell  = f'<span style="color:#f59e0b;font-size:.65rem;">📅 {scheduled}</span>' \
                       if scheduled and scheduled != "Not scheduled" else "—"
         rows_html += f"""
@@ -639,8 +607,8 @@ def view_leads():
              'No leads yet — share your site!</td></tr>') if not rows else ""
 
     return _admin_page(
-        title    = "BuildSpark — Leads",
-        heading  = "Leads Database",
+        title    = "⚡ BuildSpark — Leads",
+        heading  = "⚡ Leads Database",
         subhead  = "All leads from web forms and phone calls",
         count    = f"{len(rows)} TOTAL LEADS",
         active   = "leads",
@@ -743,11 +711,12 @@ def _admin_page(title, heading, subhead, count, active,
 
 
 # ══════════════════════════════════════════════════════════════
-#  Start
+#  Start — init_db() runs with BOTH gunicorn and python app.py
 # ══════════════════════════════════════════════════════════════
 
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     print("""
 ╔══════════════════════════════════════════════════════════╗
 ║             BuildSpark is Running! ⚡                    ║
