@@ -661,18 +661,25 @@ def _admin_page(title, heading, subhead, count, active,
   table{{width:100%;border-collapse:collapse;font-size:.7rem;}}
   th{{background:{accent};color:{'#060b12' if accent=='#f59e0b' else 'white'};
       padding:12px 14px;text-align:left;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;}}
-  td{{padding:11px 14px;border-bottom:1px solid rgba(14,165,233,.08);
-      vertical-align:top;max-width:260px;word-wrap:break-word;}}
-  tr:hover td{{background:rgba(14,165,233,.04);}}
-  .badge-web{{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.25);
-              padding:2px 8px;border-radius:2px;font-size:.6rem;}}
-  .badge-call{{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25);
-               padding:2px 8px;border-radius:2px;font-size:.6rem;}}
-  a{{color:#0ea5e9;text-decoration:none;}}
-  a:hover{{text-decoration:underline;}}
-  .back{{display:block;margin-bottom:24px;color:#0ea5e9;font-size:.68rem;
-         letter-spacing:.1em;text-transform:uppercase;width:fit-content;}}
-</style></head>
+        td{padding:11px 14px;border-bottom:1px solid rgba(14,165,233,.08);
+            vertical-align:top;max-width:260px;word-wrap:break-word;}
+        tr:hover td{background:rgba(14,165,233,.04);}
+        .badge-web{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.25);
+                    padding:2px 8px;border-radius:2px;font-size:.6rem;}
+        .badge-call{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25);
+                    padding:2px 8px;border-radius:2px;font-size:.6rem;}
+        a{color:#0ea5e9;text-decoration:none;}
+        a:hover{text-decoration:underline;}
+        .back{display:block;margin-bottom:24px;color:#0ea5e9;font-size:.68rem;
+                letter-spacing:.1em;text-transform:uppercase;width:fit-content;}
+        
+        /* Ensure all text wraps nicely and doesn't force a horizontal scroll bar */
+        p, h1, h2, h3, h4, h5, h6, .step-desc, .project-desc, .team-bio {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+    </style></head>
 <body>
   <a href="/" class="back">← Back to Website</a>
   <h1>{heading}</h1>
